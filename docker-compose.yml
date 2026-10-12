@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: medai-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: medai
+      POSTGRES_PASSWORD: medai_password
+      POSTGRES_DB: medai
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - medai_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  medai_postgres_data:
