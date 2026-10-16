@@ -124,6 +124,60 @@ def get_reminder(
     return reminder
 
 
+@router.put(
+    "/{reminder_id}",
+    response_model=MedicationReminderResponse
+)
+def update_reminder(
+    reminder_id: int,
+    reminder_data: MedicationReminderCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    reminder = (
+        db.query(MedicationReminder)
+        .join(
+            Medication,
+            Medication.id == MedicationReminder.medication_id
+        )
+        .filter(
+            MedicationReminder.id == reminder_id,
+            Medication.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if reminder is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Medication reminder not found"
+        )
+
+    medication = (
+        db.query(Medication)
+        .filter(
+            Medication.id == reminder_data.medication_id,
+            Medication.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if medication is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Medication not found"
+        )
+
+    reminder.medication_id = reminder_data.medication_id
+    reminder.reminder_time = reminder_data.reminder_time
+    reminder.days_of_week = reminder_data.days_of_week
+
+    db.commit()
+    db.refresh(reminder)
+
+    return reminder
+
+
 @router.delete(
     "/{reminder_id}",
     status_code=status.HTTP_204_NO_CONTENT

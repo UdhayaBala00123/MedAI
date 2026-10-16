@@ -10,7 +10,7 @@ from pwdlib import PasswordHash
 
 SECRET_KEY = "change-this-secret-key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 760
 
 
 # =========================
